@@ -1,7 +1,5 @@
 /// <reference types="cypress" />
 
-const { forEach } = require('cypress/types/lodash');
-
 const restaurants = [
   'Chick-fil-A',
   'McDonalds',
@@ -56,7 +54,7 @@ describe('Secret Menu Items', () => {
   restaurants.forEach((restaurant) => {
     it(`should only display rows that match ${restaurant} when selected`, () => {
       cy.get('#restaurant-visibility-filter').select(restaurant);
-      cy.get('td[headers="whereToOrder-column]')
+      cy.get('td[headers="whereToOrder-column"]')
         .should('contain', restaurant)
         .and('have.length.at.least', 1);
     });
@@ -67,10 +65,12 @@ describe('Secret Menu Items', () => {
       cy.get('#minimum-rating-visibility').as('rating-filter');
     });
 
-    forEach((rating) => {
+    ratings.forEach((rating) => {
       it(`should only display items with rating of ${rating} or higher`, () => {
         cy.get('@rating-filter').invoke('val', rating).trigger('change');
-        cy.get('td.popularity').invoke('text').should('be.gte', rating);
+        cy.get('td.popularity').each(($el) => {
+          expect(+$el.text()).to.be.gte(rating);
+        });
       });
     });
   });
